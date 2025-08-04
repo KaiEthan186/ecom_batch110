@@ -1,6 +1,11 @@
 <?php
 
     require_once "dbconnect.php";
+
+    if(!isset($_SESSION))
+    {
+        session_start();
+    }
     try{
         $sql="select * from category";
         $stmt=$conn->prepare($sql);
@@ -29,8 +34,23 @@
         //upload to a specified directory
         $status= move_uploaded_file($fileImage['tmp_name'],$filePath);
         if ($status){
-            echo"file uploaded";
-            echo"<img src=$filePath>";
+            try{ //insert data into database
+                //productID	productName	category	price	description	Qty	imagePath	
+
+                $sql= "insert into product values (?,?,?,?,?,?,?)";
+                $stmt=$conn->prepare($sql);
+                $flag=$stmt->execute([null,$name,$category,$price, $description,$qty,$filePath]);
+                $id=$conn->lastInsertId();
+                
+                if($flag){
+                    $message="new product with id $id has been inserted successfully!";
+                    $_Session['message']=$message;
+                    header("Location:viewProduct.php");
+                }
+            }catch(PDOException $e){
+                
+                echo "". $e->getMessage();
+            }
         }else{
             echo"file upload fail";
         }
@@ -73,7 +93,7 @@
                             <?php
                             if (isset($categories)) {
                                 foreach ($categories as $category) {
-                                    echo "<option value=$category[catId]> $category[catName]</option>";
+                                    echo "<option value=$category[catID]> $category[catName]</option>";
                                 }
                             }
                             ?>
@@ -85,6 +105,7 @@
                                 <input type="number" class="form-control" name="qty">
                             </div>
                             <div class="mb-1">
+                                <label for="">Description</label>
                                 <textarea name="description" id="" class="form-control">
 
                                 </textarea>
