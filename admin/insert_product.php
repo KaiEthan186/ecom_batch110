@@ -12,7 +12,7 @@
         $stmt->execute();
         $categories=$stmt->fetchAll();
     }catch(PDOException $e) {
-        echo"". $e->getMessage();  
+        echo"". $e->getMessage();    
     }
 
     if(isset($_POST["insertBtn"])){
@@ -44,8 +44,8 @@
                 
                 if($flag){
                     $message="new product with id $id has been inserted successfully!";
-                    $_Session['message']=$message;
-                    header("Location:viewProduct.php");
+                    $_SESSION['message']=$message;
+                    header("Location:viewProduct2.php");
                 }
             }catch(PDOException $e){
                 
